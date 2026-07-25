@@ -1,0 +1,32 @@
+# Local infrastructure only (MongoDB + Redis) for Epic 00 / M5 verification.
+# Full application Compose (web, api, worker) lands in M10 — Architecture 1.1.
+
+services:
+  mongodb:
+    image: mongo:7
+    container_name: project-genesis-mongodb
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongodb_data:/data/db
+    healthcheck:
+      test: ['CMD', 'mongosh', '--eval', "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: project-genesis-redis
+    ports:
+      # Host 6380 avoids clashing with other local Redis instances on 6379.
+      # Point REDIS_URL at redis://localhost:6380 when using this compose file.
+      - '6380:6379'
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  mongodb_data:

@@ -1,0 +1,1 @@
+npx --yes pnpm@9.15.9 exec lint-staged
