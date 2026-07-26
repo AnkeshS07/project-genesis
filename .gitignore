@@ -15,7 +15,9 @@ out
 .env
 .env.local
 .env.*.local
+docker/.env
 !.env.example
+!docker/.env.example
 
 # Logs
 logs
@@ -37,6 +39,13 @@ Thumbs.db
 .cache
 .eslintcache
 .tmp
+test-results
+playwright-report
+playwright/.cache
+blob-report
 
-# Docker
+# Local notes (not part of the product tree)
+project req.txt
+
 *.pid
+

@@ -5,8 +5,8 @@ import Redis from 'ioredis';
 import type { EnvConfig } from '../config/env.validation';
 
 /**
- * Owns the Redis client lifecycle for the API process.
- * No cache/session/queue usage in M5 — connectivity + health only.
+ * Owns the Redis client lifecycle for the API process (health/ping).
+ * BullMQ uses a separate Redis connection (maxRetriesPerRequest: null).
  */
 @Injectable()
 export class RedisService implements OnModuleInit, OnModuleDestroy {

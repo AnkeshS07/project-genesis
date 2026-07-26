@@ -1,7 +1,9 @@
 import type { ArgumentsHost, ExceptionFilter } from '@nestjs/common';
-import { Catch, HttpException, HttpStatus, Logger } from '@nestjs/common';
+import { Catch, HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import type { Request, Response } from 'express';
-import { REQUEST_ID_HEADER } from '../middleware/request-id.middleware';
+import { getRequestId } from '../../telemetry/correlation/correlation.context';
+import { AppLogger } from '../../telemetry/logging/app-logger.service';
+import { REQUEST_ID_HEADER } from '../../telemetry/telemetry.constants';
 
 interface ErrorBody {
   success: false;
@@ -13,14 +15,15 @@ interface ErrorBody {
 }
 
 @Catch()
+@Injectable()
 export class GlobalExceptionFilter implements ExceptionFilter {
-  private readonly logger = new Logger(GlobalExceptionFilter.name);
+  constructor(private readonly appLogger: AppLogger) {}
 
   catch(exception: unknown, host: ArgumentsHost): void {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
-    const requestId = request.header(REQUEST_ID_HEADER) ?? undefined;
+    const requestId = getRequestId() ?? request.header(REQUEST_ID_HEADER) ?? undefined;
 
     const status =
       exception instanceof HttpException ? exception.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR;
@@ -50,14 +53,16 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     }
 
     if (status >= 500) {
-      this.logger.error(
+      this.appLogger.error(
+        message,
         {
           requestId,
           path: request.url,
           method: request.method,
-          err: exception instanceof Error ? exception.stack : exception,
+          status,
+          code,
         },
-        message,
+        exception,
       );
     }
 

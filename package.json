@@ -14,7 +14,13 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit -p tsconfig.json && pnpm -r run typecheck",
-    "build": "pnpm -r run build"
+    "build": "pnpm -r run build",
+    "test": "pnpm test:unit",
+    "test:unit": "pnpm --filter @project-genesis/server test:unit && pnpm --filter @project-genesis/web test:unit",
+    "test:api": "pnpm --filter @project-genesis/server test:api",
+    "test:integration": "pnpm --filter @project-genesis/server test:integration",
+    "test:e2e": "playwright test -c tests/e2e/playwright.config.ts",
+    "test:cov": "pnpm --filter @project-genesis/server test:cov && pnpm --filter @project-genesis/web test:cov"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx,mjs,cjs}": [
@@ -28,6 +34,7 @@
   "devDependencies": {
     "@eslint/js": "^9.22.0",
     "@next/eslint-plugin-next": "^15.2.3",
+    "@playwright/test": "^1.62.0",
     "@types/node": "^22.13.10",
     "eslint": "^9.22.0",
     "eslint-config-prettier": "^10.1.1",

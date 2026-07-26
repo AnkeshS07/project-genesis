@@ -1,0 +1,25 @@
+name: Setup Node + pnpm
+description: Node 20 (from .nvmrc), Corepack, pnpm 9.15.9, store cache, frozen install
+
+runs:
+  using: composite
+  steps:
+    - name: Enable Corepack
+      shell: bash
+      run: corepack enable
+
+    - name: Prepare pnpm (match packageManager)
+      shell: bash
+      run: corepack prepare pnpm@9.15.9 --activate
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version-file: .nvmrc
+        cache: pnpm
+
+    - name: Install dependencies
+      shell: bash
+      run: pnpm install --frozen-lockfile
+      env:
+        HUSKY: '0'

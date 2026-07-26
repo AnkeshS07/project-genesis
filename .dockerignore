@@ -1,0 +1,54 @@
+# Dependencies & builds
+node_modules
+**/node_modules
+.git
+.github
+.husky
+.cursor
+.next
+**/.next
+dist
+**/dist
+coverage
+**/coverage
+test-results
+playwright-report
+playwright/.cache
+blob-report
+*.tsbuildinfo
+.turbo
+.cache
+.tmp
+
+# Env & secrets (never bake into images)
+.env
+.env.*
+**/.env
+**/.env.*
+!.env.example
+!**/.env.example
+!docker/.env.example
+
+# Host / agent / local noise
+agent-transcripts
+**/*.jsonl
+project req.txt
+
+# Docs & non-runtime
+docs
+**/*.md
+!docker/README.md
+
+# Tests (not needed in runtime images)
+**/test
+**/tests
+**/*.spec.ts
+**/*.spec.tsx
+
+# IDE / OS
+.idea
+.vscode
+.DS_Store
+Thumbs.db
+*.log
+*.pid

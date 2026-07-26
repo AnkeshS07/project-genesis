@@ -22,7 +22,7 @@ The architecture has been fully documented before implementation to ensure consi
 
 # Application Monorepo (Getting Started)
 
-Architecture Version **1.1** uses a pnpm monorepo. Application packages (`apps/web`, `server`, `packages/*`) are added in later Epic 00 milestones. Milestone **M1** establishes root tooling only.
+Architecture Version **1.1** uses a pnpm monorepo (`apps/web`, `server`, `packages/*`). Epic **00** (Project Bootstrap) is **complete** (M0–M12).
 
 ## Prerequisites
 
@@ -43,7 +43,14 @@ pnpm lint
 pnpm format:check
 pnpm build
 pnpm typecheck
+pnpm test:unit
+pnpm test:api
+pnpm test:integration
+pnpm test:e2e
+pnpm test:cov
 ```
+
+See [`tests/README.md`](tests/README.md) for the testing pyramid, folder ownership, and optional `TEST_*` integration URLs.
 
 ## Workspace packages (M2+)
 
@@ -59,7 +66,19 @@ pnpm typecheck
 
 Copy `.env.example` to `.env` for local overrides. Never commit real secrets.
 
-## Workspace layout (target)
+## Docker (M10)
+
+```bash
+docker compose -f docker/docker-compose.yml --env-file docker/.env.example up --build -d
+```
+
+Images: `docker/Dockerfile.api`, `Dockerfile.worker`, `Dockerfile.web`. Runbook: [`docker/README.md`](docker/README.md).
+
+## CI (M11)
+
+GitHub Actions CI (no deploy). Pull requests run lint, typecheck, unit, API, optional integration, and Docker image builds. Pushes to `main` also run Playwright Chromium E2E and upload coverage artifacts.
+
+Runbook: [`.github/workflows/README.md`](.github/workflows/README.md).
 
 ```text
 apps/web      → Next.js UI only (M4+)
@@ -289,16 +308,16 @@ If a change is required:
 
 # Implementation Status
 
-| Phase               | Status      |
-| ------------------- | ----------- |
-| Product Planning    | ✅ Complete |
-| Architecture        | ✅ Complete |
-| Specifications      | ✅ Complete |
-| Roadmap             | ✅ Complete |
-| Project Bootstrap   | ⏳ Pending  |
-| Feature Development | ⏳ Pending  |
-| Testing             | ⏳ Pending  |
-| Production          | ⏳ Pending  |
+| Phase               | Status         |
+| ------------------- | -------------- |
+| Product Planning    | ✅ Complete    |
+| Architecture        | ✅ Complete    |
+| Specifications      | ✅ Complete    |
+| Roadmap             | ✅ Complete    |
+| Project Bootstrap   | ⏳ Pending     |
+| Feature Development | ⏳ Pending     |
+| Testing             | ✅ M9 scaffold |
+| Production          | ⏳ Pending     |
 
 ---
 
@@ -386,8 +405,13 @@ Completed:
 - ✔ M3 NestJS API Core
 - ✔ M4 Next.js UI Shell
 - ✔ M5 MongoDB + Redis Infrastructure
+- ✔ M6 Provider Layer Foundation
+- ✔ M7 BullMQ / Worker Infrastructure
+- ✔ M8 Observability Infrastructure
+- ✔ M9 Testing Infrastructure
+- ✔ M10 Docker & Containerization _(implemented — awaiting review)_
 
-Next: **M6** Provider abstraction interfaces
+Next: **M11** CI/CD Pipeline
 
 ```
 docs/01-epics/

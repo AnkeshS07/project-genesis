@@ -1,6 +1,6 @@
 # Epic 00 — Project Bootstrap
 
-> Status: **In Progress (M5 complete)**
+> Status: **Complete (M0–M12 closed) — ready for Epic 01**
 
 ---
 
@@ -152,8 +152,8 @@ Epic 01 — Authentication
 |------|--------|
 | Planning | ✅ Complete |
 | Architecture | ✅ Complete |
-| Bootstrap | 🔄 M5 complete — awaiting review |
-| Development | ⏳ Pending |
+| Bootstrap | ✅ Complete (M0–M12) — proceed to Epic 01 Authentication |
+| Development | ➡️ Next: Epic 01 |
 
 ---
 
@@ -161,4 +161,4 @@ Project Genesis
 
 Architecture Version **1.1**
 
-Bootstrap (Epic 00) In Progress — M0–M5 complete
+Bootstrap (Epic 00) **Complete** — proceed to Epic 01 — Authentication

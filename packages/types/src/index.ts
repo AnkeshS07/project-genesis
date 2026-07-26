@@ -1,5 +1,6 @@
 /**
- * Shared type placeholders. Domain types are added in later epics.
+ * Shared type placeholders. Domain types land in later epics.
+ * `WorkspaceId` is reserved for Epic 03 (Workspaces) — not used in bootstrap APIs.
  */
 export type WorkspaceId = string;
 

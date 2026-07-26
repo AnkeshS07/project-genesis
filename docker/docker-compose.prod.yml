@@ -1,0 +1,155 @@
+# Production-oriented compose — Epic 00 / M10
+# No bind mounts. Images expected to be pre-built or built once.
+# Usage (from repo root):
+#   docker compose -f docker/docker-compose.prod.yml --env-file docker/.env.example up -d --build
+
+name: project-genesis-prod
+
+services:
+  mongodb:
+    image: mongo:7
+    restart: always
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - genesis
+    healthcheck:
+      test: ['CMD', 'mongosh', '--eval', "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+    # Prefer not publishing DB ports in production; override if needed.
+    expose:
+      - '27017'
+
+  redis:
+    image: redis:7-alpine
+    restart: always
+    command: ['redis-server', '--appendonly', 'yes']
+    volumes:
+      - redis_data:/data
+    networks:
+      - genesis
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+    expose:
+      - '6379'
+
+  api:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.api
+    image: ${API_IMAGE:-project-genesis-api:prod}
+    restart: always
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      DATABASE_URL: ${DATABASE_URL:-mongodb://mongodb:27017/project-genesis}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379}
+    ports:
+      - '${API_HOST_PORT:-3001}:3001'
+    networks:
+      - genesis
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://127.0.0.1:3001/live').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  worker:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.worker
+    image: ${WORKER_IMAGE:-project-genesis-worker:prod}
+    restart: always
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: ${DATABASE_URL:-mongodb://mongodb:27017/project-genesis}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379}
+    networks:
+      - genesis
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test:
+        ['CMD', 'node', '-e', "require('fs').accessSync('dist/worker.main.js'); process.exit(0)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+  web:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.web
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3001}
+    image: ${WEB_IMAGE:-project-genesis-web:prod}
+    restart: always
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      HOSTNAME: 0.0.0.0
+    ports:
+      - '${WEB_HOST_PORT:-3000}:3000'
+    networks:
+      - genesis
+    depends_on:
+      api:
+        condition: service_healthy
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://127.0.0.1:3000').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+networks:
+  genesis:
+    driver: bridge
+    name: project-genesis-prod-net
+
+volumes:
+  mongodb_data:
+  redis_data:
