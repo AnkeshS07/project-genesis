@@ -11,9 +11,19 @@ const monorepoRoot = path.join(path.dirname(fileURLToPath(import.meta.url)), '..
  */
 const useStandalone = process.env.DOCKER_BUILD === '1';
 
+const apiProxyTarget = process.env.API_PROXY_TARGET ?? 'http://localhost:3001';
+
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   transpilePackages: ['@project-genesis/sdk', '@project-genesis/types', '@project-genesis/shared'],
+  async rewrites() {
+    return [
+      {
+        source: '/api/v1/:path*',
+        destination: `${apiProxyTarget}/api/v1/:path*`,
+      },
+    ];
+  },
   ...(useStandalone
     ? {
         output: 'standalone' as const,

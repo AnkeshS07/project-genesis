@@ -2,7 +2,7 @@
 module.exports = {
   displayName: 'web-unit',
   rootDir: '..',
-  testMatch: ['<rootDir>/test/unit/**/*.spec.tsx'],
+  testMatch: ['<rootDir>/test/unit/**/*.spec.ts', '<rootDir>/test/unit/**/*.spec.tsx'],
   testEnvironment: 'jsdom',
   transform: {
     '^.+\\.(ts|tsx)$': [
@@ -20,7 +20,11 @@ module.exports = {
     '^@project-genesis/shared$': '<rootDir>/../../packages/shared/src/index.ts',
   },
   setupFilesAfterEnv: ['<rootDir>/test/setup-unit.ts'],
-  collectCoverageFrom: ['app/page.tsx', 'lib/api-client.ts'],
+  collectCoverageFrom: [
+    'app/(marketing)/page.tsx',
+    'features/auth/**/*.ts',
+    'lib/api-client.ts',
+  ],
   coverageDirectory: '<rootDir>/coverage/unit',
   clearMocks: true,
 };

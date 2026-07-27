@@ -2,9 +2,14 @@ import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { z } from 'zod';
 
+const jwtDurationSchema = z
+  .string()
+  .trim()
+  .min(1)
+  .regex(/^\d+[smhd]$/i, 'must be a duration like 15m, 7d, 3600s');
+
 /**
- * M5 environment schema — API process + MongoDB + Redis.
- * JWT / AI / storage secrets remain deferred to later milestones.
+ * Environment schema — API + Mongo + Redis + JWT + auth core tuning (Epic 01 M2).
  */
 export const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
@@ -23,6 +28,19 @@ export const envSchema = z.object({
       (value) => value.startsWith('redis://') || value.startsWith('rediss://'),
       'REDIS_URL must be a redis:// or rediss:// URI',
     ),
+  JWT_SECRET: z
+    .string({ required_error: 'JWT_SECRET is required' })
+    .min(32, 'JWT_SECRET must be at least 32 characters'),
+  JWT_ACCESS_EXPIRES_IN: jwtDurationSchema.default('15m'),
+  JWT_REFRESH_EXPIRES_IN: jwtDurationSchema.default('7d'),
+  AUTH_MAX_ACTIVE_SESSIONS: z.coerce.number().int().positive().max(100).default(10),
+  AUTH_ARGON2_MEMORY_KIB: z.coerce.number().int().positive().default(19_456),
+  AUTH_ARGON2_TIME_COST: z.coerce.number().int().positive().default(2),
+  AUTH_ARGON2_PARALLELISM: z.coerce.number().int().positive().default(1),
+  AUTH_REFRESH_COOKIE_NAME: z.string().trim().min(1).default('refresh_token'),
+  AUTH_REFRESH_COOKIE_PATH: z.string().trim().min(1).default('/api/v1/auth'),
+  AUTH_COOKIE_SAMESITE: z.enum(['strict', 'lax', 'none']).default('lax'),
+  AUTH_PASSWORD_RESET_EXPIRES_IN: jwtDurationSchema.default('1h'),
 });
 
 export type EnvConfig = z.infer<typeof envSchema>;

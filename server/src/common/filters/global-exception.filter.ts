@@ -45,7 +45,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         message = body.message.join(', ');
         code = 'VALIDATION_ERROR';
       }
-      if (typeof body.error === 'string') {
+      if (typeof body.error === 'string' && code !== 'VALIDATION_ERROR') {
         code = body.error.toUpperCase().replace(/\s+/g, '_');
       }
     } else if (exception instanceof Error) {

@@ -21,6 +21,13 @@ module.exports = {
     'src/workers/worker-log.context.ts',
     'src/jobs/job.registry.ts',
     'src/jobs/jobs.constants.ts',
+    'src/repositories/base.repository.ts',
+    'src/users/user.schema.ts',
+    'src/sessions/session.schema.ts',
+    'src/auth/password.service.ts',
+    'src/auth/token.service.ts',
+    'src/auth/session.service.ts',
+    'src/auth/duration.util.ts',
   ],
   coverageDirectory: '<rootDir>/coverage/unit',
 };

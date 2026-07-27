@@ -8,9 +8,9 @@ Each folder is an independent Epic.
 
 | Epic | Folder | Status |
 |------|--------|--------|
-| 00 | [00-project-bootstrap](./00-project-bootstrap/) | Not Started |
-| 01 | [01-authentication](./01-authentication/) | Not Started |
-| 02 | [02-users](./02-users/) | Not Started |
+| 00 | [00-project-bootstrap](./00-project-bootstrap/) | Complete |
+| 01 | [01-authentication](./01-authentication/) | Complete (M1–M4) |
+| 02 | [02-users](./02-users/) | Planned |
 | 03 | [03-workspaces](./03-workspaces/) | Not Started |
 | 04 | [04-projects](./04-projects/) | Not Started |
 | 05 | [05-characters](./05-characters/) | Not Started |

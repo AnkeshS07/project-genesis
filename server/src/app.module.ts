@@ -10,9 +10,13 @@ import { JobsModule } from './jobs/jobs.module';
 import { ProvidersModule } from './providers/providers.module';
 import { QueuesModule } from './queues/queues.module';
 import { HealthModule } from './modules/health/health.module';
+import { AuthHttpModule } from './modules/auth/auth-http.module';
+import { AuthModule } from './auth/auth.module';
+import { SessionsModule } from './sessions/sessions.module';
 import { CorrelationMiddleware } from './telemetry/correlation/correlation.middleware';
 import { REQUEST_ID_HEADER, TELEMETRY_SERVICE_KIND } from './telemetry/telemetry.constants';
 import { TelemetryModule } from './telemetry/telemetry.module';
+import { UsersModule } from './users/users.module';
 
 const isProduction = process.env.NODE_ENV === 'production';
 
@@ -41,6 +45,10 @@ const isProduction = process.env.NODE_ENV === 'production';
       },
     }),
     DatabaseModule,
+    UsersModule,
+    SessionsModule,
+    AuthModule,
+    AuthHttpModule,
     ProvidersModule,
     QueuesModule,
     JobsModule,

@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 
-import { ValidationPipe } from '@nestjs/common';
+import cookieParser from 'cookie-parser';
+import { ValidationPipe, RequestMethod, HttpStatus } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
@@ -22,6 +23,8 @@ async function bootstrap(): Promise<void> {
   // Ensure process handlers + shutdown logging are constructed.
   app.get(TelemetryLifecycleService);
 
+  app.use(cookieParser());
+
   // ValidationPipe is Nest's standard bootstrap construction (no injectable deps).
   app.useGlobalPipes(
     new ValidationPipe({
@@ -29,6 +32,7 @@ async function bootstrap(): Promise<void> {
       forbidNonWhitelisted: true,
       transform: true,
       transformOptions: { enableImplicitConversion: true },
+      errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
     }),
   );
 
@@ -36,13 +40,29 @@ async function bootstrap(): Promise<void> {
   app.useGlobalInterceptors(app.get(TimingInterceptor), app.get(ResponseEnvelopeInterceptor));
   app.enableShutdownHooks();
 
-  // Domain REST APIs will use /api/v1 later. Health probes stay unversioned at root.
+  app.setGlobalPrefix('api/v1', {
+    exclude: [
+      { path: 'health', method: RequestMethod.GET },
+      { path: 'ready', method: RequestMethod.GET },
+      { path: 'live', method: RequestMethod.GET },
+      'docs',
+      'docs-json',
+    ],
+  });
+
   const swaggerConfig = new DocumentBuilder()
     .setTitle('Project Genesis API')
     .setDescription(
-      'Infrastructure bootstrap — MongoDB + Redis; providers; BullMQ; observability ports (no vendors). Epic 00 / M8.',
+      'Project Genesis REST API — authentication, health probes, and infrastructure (Architecture 1.1).',
     )
-    .setVersion('0.0.0')
+    .setVersion('1.0.0')
+    .addBearerAuth()
+    .addCookieAuth('refresh_token', {
+      type: 'apiKey',
+      in: 'cookie',
+      name: 'refresh_token',
+      description: 'HttpOnly refresh token cookie (path=/api/v1/auth)',
+    })
     .build();
 
   const document = SwaggerModule.createDocument(app, swaggerConfig);
@@ -58,6 +78,7 @@ async function bootstrap(): Promise<void> {
     port,
     health: '/health /ready /live',
     docs: `/docs`,
+    api: '/api/v1',
   });
 }
 

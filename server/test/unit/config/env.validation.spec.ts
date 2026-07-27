@@ -15,6 +15,7 @@ describe('validateEnv', () => {
         NODE_ENV: 'test',
         PORT: '3001',
         REDIS_URL: 'redis://localhost:6379',
+        JWT_SECRET: 'test-jwt-secret-minimum-32-characters!',
       }),
     ).toThrow(/DATABASE_URL/);
   });

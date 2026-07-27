@@ -58,6 +58,9 @@ services:
       PORT: 3001
       DATABASE_URL: mongodb://mongodb:27017/project-genesis
       REDIS_URL: redis://redis:6379
+      JWT_SECRET: ${JWT_SECRET:-change-me-in-local-development-min-32-chars}
+      JWT_ACCESS_EXPIRES_IN: ${JWT_ACCESS_EXPIRES_IN:-15m}
+      JWT_REFRESH_EXPIRES_IN: ${JWT_REFRESH_EXPIRES_IN:-7d}
     ports:
       - '${API_HOST_PORT:-3001}:3001'
     networks:
@@ -96,6 +99,9 @@ services:
       NODE_ENV: production
       DATABASE_URL: mongodb://mongodb:27017/project-genesis
       REDIS_URL: redis://redis:6379
+      JWT_SECRET: ${JWT_SECRET:-change-me-in-local-development-min-32-chars}
+      JWT_ACCESS_EXPIRES_IN: ${JWT_ACCESS_EXPIRES_IN:-15m}
+      JWT_REFRESH_EXPIRES_IN: ${JWT_REFRESH_EXPIRES_IN:-7d}
     networks:
       - genesis
     depends_on:

@@ -4,7 +4,7 @@ import { RedisModule } from './redis.module';
 
 /**
  * Aggregates MongoDB + Redis infrastructure for the NestJS API.
- * Domain schemas / repositories are intentionally absent (M5).
+ * Domain persistence (users/sessions) is registered via feature modules (Epic 01 M1).
  */
 @Module({
   imports: [MongoModule, RedisModule],
